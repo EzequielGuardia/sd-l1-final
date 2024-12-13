@@ -1,1 +1,19 @@
-[]
+[
+    {
+        "id": 1,
+        "title": "Titanic",
+        "tags": ["Triste"]
+      },
+
+      {
+        "id": 2,
+        "title": "Marvel",
+        "tags": ["Fantastica"]
+      },
+
+      {
+        "id": 3,
+        "title": "Jhon Wick",
+        "tags": ["Accion"]
+      }
+]
