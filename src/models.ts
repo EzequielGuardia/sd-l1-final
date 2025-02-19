@@ -13,11 +13,19 @@ class Peli {
 }
 
 class PelisCollection {
+  
   getAll(): Promise<Peli[]> {
-    return jsonfile.readFile("...laRutaDelArchivo").then(() => {
-      // la respuesta de la promesa
+    return jsonfile.readFile("../pelis.json").then((data) => {
+      return data; 
+    }).catch((error) => {
+      console.log("Este archivo no se leyo correctamente", error)
       return [];
-    });
+    })
+    
   }
 }
+  
+  
+
+
 export { PelisCollection, Peli };
