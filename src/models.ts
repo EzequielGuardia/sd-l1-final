@@ -23,7 +23,22 @@ class PelisCollection {
     })
     
   }
-}
+
+  getByid(id: number): Promise<Peli | null> {
+    return this.getAll().then((pelis: Peli[]) => {
+      const peliexistente = pelis.find(peli => peli.id === id)
+      return peliexistente || null
+    }).catch((error) => {
+      console.log("no se ha podido leer el archivo correctamente");
+      return null
+    });
+
+    } 
+  
+    
+  }
+
+
   
   
 
