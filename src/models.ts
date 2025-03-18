@@ -49,7 +49,7 @@ class PelisCollection {
 
         data.peliculas.push(pelicula);
 
-       const promesa2 = jsonfile.writeFile("./pelis.json", data);
+        const promesa2 = jsonfile.writeFile("./pelis.json", data);
         return promesa2.then((resolve)=> {
             return true
         });
@@ -60,14 +60,23 @@ class PelisCollection {
     
     } 
 
-    
+    async search(options: {title?: string; tag?: string }): Promise<Peli[]> {
+      let peliculas = await this.getAll()
+
+        if (options.title) {
+          peliculas = peliculas.filter((peli) => 
+          peli.title.toLowerCase().includes(options.title.toLowerCase()))
+        };
+
+        if (options.tag) {
+          peliculas = peliculas.filter((peli) => 
+          peli.tags.includes(options.tag))
+        };
+
+        return peliculas
+      }
+    }
   
     
     
-
-
-  
-  
-
-  }
 export { PelisCollection, Peli };
