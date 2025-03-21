@@ -23,8 +23,18 @@ class PelisController {
   } else {
      return this.model.getAll();
   }
-
+  
+  
   }
+  async getOne(options?: Options): Promise<Peli[]> {
+    return this.getOne(options)[0];
+  }
+
+  async add(pelicula: Peli): Promise<boolean> {
+    return this.add(pelicula);
+  }
+
+  
 
 }
 export { PelisController };
