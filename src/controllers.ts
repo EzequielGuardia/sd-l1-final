@@ -1,40 +1,49 @@
-import { PelisCollection, Peli } from "./models";
+import { Peli,  PelisCollection } from "./models";
 
 type Options = {
   id?: number;
   search?: {
     tag?: string;
-    titile? : string;
-  };
-};
+    title? : string;
+  }
+}
 
 class PelisController {
-    private model:  PelisCollection;
-  constructor() {
-    this.model = new PelisCollection();
-  }
+    model: PelisCollection;
 
-  async get(options?: Options): Promise<Peli[]> {
-    if (options?.id) {
-      const peli = await this.model.getByid(options.id);
-      return peli ? [peli]: [];
-    } else if (options?.search) {
-      return this.model.search(options.search)
-  } else {
-     return this.model.getAll();
-  }
-  
-  
-  }
-  async getOne(options?: Options): Promise<Peli[]> {
-    return this.getOne(options)[0];
-  }
+    constructor() {
+      this.model = new PelisCollection();
+    }
 
-  async add(pelicula: Peli): Promise<boolean> {
-    return this.add(pelicula);
-  }
+    async get(options?: Options): Promise<Peli[]> {
+      if(options?.id) {
+          const peliencontrada =  await this.model.getById(options?.id); // Obtener peliculas por id o ninguna
+          return [peliencontrada];
+      }
+      return []
+    }
 
-  
 
+    async search(options?: Options): Promise<Peli[]> {
+      if(options?.id){
+        const peli = await this.model.getById(options.id); // Buscar por ID
+        return peli ? [peli] : [];
+      }else if(options?.search){
+        return this.model.search(options.search); // Buscar por opciones
+      } else {
+        return this.model.getAll(); // Entrega todas las peliculas
+      }
+    }
+
+    async add(pelicula: Peli): Promise<boolean> {
+      const existe = await this.model.getById(pelicula.id)
+      if(existe){
+        return false;
+      } else {
+        await this.model.add(pelicula);
+        return true;
+      }
+    }
 }
-export { PelisController };
+
+export { PelisController }

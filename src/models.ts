@@ -12,71 +12,58 @@ class Peli {
   id: number;
   title: string;
   tags: string[];
-}
+};
 
 class PelisCollection {
   
-  getAll(): Promise<Peli[]> {
-    return jsonfile.readFile("../pelis.json").then((data) => {
-      return data; 
-    }).catch((error) => {
-      console.log("Este archivo no se leyo correctamente", error)
-      return [];
-    })
-    
+  async getAll(): Promise<Peli[]> {
+  try {
+    const pelis = await jsonfile.readFile("./pelis.json");
+    return pelis;
+  } catch (e) {
+    return []; // si no existe o da error, devolvemos lista vacía
+  }
+}
+
+  async getById(id: number): Promise<Peli | null> {
+    const pelis: Peli[] = await this.getAll();
+    const peliEncontrada = pelis.find(peli => peli.id === id)
+    return peliEncontrada || null;
   }
 
-  getByid(id: number): Promise<Peli | null> {
-    return this.getAll().then((pelis: Peli[]) => {
-      const peliexistente = pelis.find(peli => peli.id === id)
-      return peliexistente
-    }).catch((error) => {
-      console.log("no se ha podido leer el archivo correctamente");
-      return null
-    });
-  }
+  async add(peli: Peli): Promise<boolean> {
+    const pelis = await this.getAll();
+    const yaExiste = await this.getById(peli.id);
 
-    addPeli(pelicula: Peli): Promise<Boolean> {
-      const promesa1 = this.getByid(pelicula.id).then((peliexistente) => 
-      { if (peliexistente) {
-        return false
-      } else {
-
-
-        const data = {
-          peliculas: [] as Peli[],
-        }
-
-        data.peliculas.push(pelicula);
-
-        const promesa2 = jsonfile.writeFile("./pelis.json", data);
-        return promesa2.then((resolve)=> {
-            return true
-        });
-      }
-    });
-    
-    return promesa1
-    
-    } 
-
-    async search(options: {title?: string; tag?: string }): Promise<Peli[]> {
-      let peliculas = await this.getAll()
-
-        if (options.title) {
-          peliculas = peliculas.filter((peli) => 
-          peli.title.toLowerCase().includes(options.title.toLowerCase()))
-        };
-
-        if (options.tag) {
-          peliculas = peliculas.filter((peli) => 
-          peli.tags.includes(options.tag))
-        };
-
-        return peliculas
-      }
+    if (yaExiste) {
+      return false;
     }
+
+    pelis.push(peli);
+    await jsonfile.writeFile("./pelis.json", pelis);
+    return true;
+  }
+
+    async search(options: { title?: string; tag?: string }): Promise<Peli[]> {
+  let peliculas = await this.getAll();
+
+  if (options.title) {
+    const titleSearch = options.title.toLowerCase();
+    peliculas = peliculas.filter((peli) =>
+      peli.title.toLowerCase().includes(titleSearch)
+    );
+  }
+
+  if (options.tag) {
+    const tagSearch = options.tag.toLowerCase();
+    peliculas = peliculas.filter((peli) =>
+      peli.tags.some((tag) => tag.toLowerCase() === tagSearch)
+    );
+  }
+
+  return peliculas;
+}
   
-    
+}  
     
 export { PelisCollection, Peli };

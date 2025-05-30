@@ -1,5 +1,6 @@
+
 import anyTest, { TestFn } from "ava";
-import { PelisController } from "./controllers";
+import { PelisController  } from "./controllers";
 import { getRandomId } from "./models.test";
 
 const TEST_ID = getRandomId();
@@ -25,7 +26,7 @@ test.serial(
     // testeo peli agregada desde el script test del package
     const controller = new PelisController();
     const peli = await controller.get({ id: 4321865 });
-    t.is(peli.title, "peli de la terminal 4321865");
+    t.is(peli[0]?.title, "peli de la terminal 4321865");
   }
 );
 
@@ -37,32 +38,46 @@ test.serial("Testeo PelisController get id", async (t) => {
     tags: ["classic", SOME_TAG],
   });
   const peli = await controller.get({ id: TEST_ID });
-  t.is(peli.title, SOME_TITLE);
+  t.is(peli.length, 1);
+  t.is(peli[0].title, SOME_TITLE);
 });
 
 test.serial("Testeo PelisController search title", async (t) => {
   const controller = new PelisController();
+
   await controller.add({
     id: TEST_ID,
     title: SOME_TITLE,
     tags: ["classic", SOME_TAG],
   });
 
-  const pelis = await controller.get({ search: { title: TEST_ID.toString() } });
+  const pelis = await controller.search({ search: { title: SOME_TITLE} });
+
   t.is(pelis.length, 1);
   t.is(pelis[0].id, TEST_ID);
+  t.true(pelis[0].title.includes(SOME_TITLE));
 });
 
 test.serial("Testeo PelisController search tag", async (t) => {
   const controller = new PelisController();
+
   await controller.add({
     id: SECOND_TEST_ID,
     title: "otra peli un poco más divertida",
     tags: [SOME_TAG],
   });
-  const pelis = await controller.get({
-    search: { title: "peli", tag: SOME_TAG },
+  await controller.add({
+    id: TEST_ID,
+    title: "Unas buena pelis",
+    tags: [SOME_TAG],
   });
-  const ids = pelis.map((b) => b.id);
-  t.deepEqual(ids, [TEST_ID, SECOND_TEST_ID]);
+
+  const pelis = await controller.search({
+    search: { tag: SOME_TAG },
+  });
+
+  const ids = pelis.map(p => p.id).sort();
+    t.is(pelis.length, 2);
+    t.deepEqual(ids, [TEST_ID, SECOND_TEST_ID].sort());
+
 });
