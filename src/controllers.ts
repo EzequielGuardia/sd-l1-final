@@ -3,10 +3,10 @@ import { Peli,  PelisCollection } from "./models";
 type Options = {
   id?: number;
   search?: {
+    title?: string;
     tag?: string;
-    title? : string;
-  }
-}
+  };
+};
 
 class PelisController {
     model: PelisCollection;
@@ -16,12 +16,21 @@ class PelisController {
     }
 
     async get(options?: Options): Promise<Peli[]> {
-      if(options?.id) {
-          const peliencontrada =  await this.model.getById(options?.id); // Obtener peliculas por id o ninguna
-          return [peliencontrada];
-      }
-      return []
-    }
+  // 1) Sin opciones: todas las películas
+  if (!options) {
+    return this.model.getAll();
+  }
+  // 2) Búsqueda por ID
+  if (options.id !== undefined) {
+    const peli = await this.model.getById(options.id);
+    return peli ? [peli] : [];    // <— devuelve [] si no existe
+  }
+  // 3) Búsqueda por title/tag
+  if (options.search) {
+    return this.model.search(options.search);
+  }
+  return [];
+}
 
 
     async search(options?: Options): Promise<Peli[]> {
@@ -46,4 +55,4 @@ class PelisController {
     }
 }
 
-export { PelisController };
+export { PelisController }
